@@ -6,12 +6,69 @@ set -e
 PROJECT="OhMyDebn"
 PROJECT_LOWER=$(echo "$PROJECT" | tr '[:upper:]' '[:lower:]')
 
+# Configuration file location
+CONFIG_DIR="$HOME/.config/$PROJECT_LOWER"
+CONFIG_FILE="$CONFIG_DIR/$PROJECT_LOWER.conf"
+
+# Default configuration values
+REPLACE_BACKGROUND=true
+INSTALL_THEMES=true
+REMOVE_PACKAGES=true
+INSTALL_FONTS=true
+
+# Package lists
+PACKAGES_TO_INSTALL="alacritty binutils btop chromium curl eza fzf git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
+PACKAGES_TO_INSTALL_UBUNTU="alacritty binutils btop chromium-browser curl eza fzf git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
+PACKAGES_TO_REMOVE="brasero firefox* thunderbird gnome-chess gnome-games goldendict-ng hexchat hoichess pidgin remmina transmission* x11vnc"
+
+# Create config directory if it doesn't exist
+mkdir -p "$CONFIG_DIR"
+
+# Create default config file if it doesn't exist
+if [ ! -f "$CONFIG_FILE" ]; then
+  cat > "$CONFIG_FILE" << 'EOF'
+# OhMyDebn Configuration File
+# Modify these settings to customize the installation
+
+# Whether to replace the desktop background
+REPLACE_BACKGROUND=true
+
+# Whether to install Mint themes
+INSTALL_THEMES=true
+
+# Whether to remove unnecessary packages
+REMOVE_PACKAGES=true
+
+# Whether to install Nerd Fonts
+INSTALL_FONTS=true
+
+# Packages to install (space-separated list)
+# For Debian:
+PACKAGES_TO_INSTALL="alacritty binutils btop chromium curl eza fzf git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
+
+# For Ubuntu (used when --ubuntu flag is passed):
+PACKAGES_TO_INSTALL_UBUNTU="alacritty binutils btop chromium-browser curl eza fzf git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
+
+# Packages to remove (space-separated list)
+PACKAGES_TO_REMOVE="brasero firefox* thunderbird gnome-chess gnome-games goldendict-ng hexchat hoichess pidgin remmina transmission* x11vnc"
+EOF
+  echo "Created configuration file at $CONFIG_FILE"
+fi
+
+# Load configuration
+source "$CONFIG_FILE"
+
 # Parse command line arguments
 NO_UNINSTALL=false
+UBUNTU_MODE=false
 for arg in "$@"; do
   case $arg in
   --no-uninstall)
     NO_UNINSTALL=true
+    shift
+    ;;
+  --ubuntu)
+    UBUNTU_MODE=true
     shift
     ;;
   *)
@@ -40,9 +97,16 @@ EOF
   echo
 }
 
-if ! grep -q "13 (trixie)" /etc/os-release; then
-  display "cat" "This script is designed for Debian 13 Cinnamon. Exiting!"
-  exit 1
+if [ "$UBUNTU_MODE" = false ]; then
+  if ! grep -q "13 (trixie)" /etc/os-release; then
+    display "cat" "This script is designed for Debian 13 Cinnamon. Use --ubuntu flag for Ubuntu. Exiting!"
+    exit 1
+  fi
+else
+  if ! grep -qi "ubuntu" /etc/os-release; then
+    display "cat" "Ubuntu mode enabled but this doesn't appear to be Ubuntu. Exiting!"
+    exit 1
+  fi
 fi
 
 if [ "$UID" -eq 0 ]; then
@@ -71,18 +135,19 @@ If it breaks your system, you get to keep both pieces!
 Press Enter to continue or Ctrl-c to cancel."
 read input
 
-SOURCESLIST=/etc/apt/sources.list
-if ! grep -q "debian.org" $SOURCESLIST; then
-  display "cat" "$SOURCESLIST does not have any debian.org references."
-  if [ -f $SOURCESLIST ]; then
-    echo "Renaming $SOURCESLIST to $SOURCESLIST.orig"
-    sudo mv $SOURCESLIST $SOURCESLIST.orig
-  fi
-  DEBIANSOURCES=/etc/apt/sources.list.d/debian.sources
-  if [ ! -f $DEBIANSOURCES ]; then
-    echo "$DEBIANSOURCES does not exist."
-    echo "Creating $DEBIANSOURCES and adding the following:"
-    cat <<EOF | sudo tee -a $DEBIANSOURCES
+if [ "$UBUNTU_MODE" = false ]; then
+  SOURCESLIST=/etc/apt/sources.list
+  if ! grep -q "debian.org" $SOURCESLIST; then
+    display "cat" "$SOURCESLIST does not have any debian.org references."
+    if [ -f $SOURCESLIST ]; then
+      echo "Renaming $SOURCESLIST to $SOURCESLIST.orig"
+      sudo mv $SOURCESLIST $SOURCESLIST.orig
+    fi
+    DEBIANSOURCES=/etc/apt/sources.list.d/debian.sources
+    if [ ! -f $DEBIANSOURCES ]; then
+      echo "$DEBIANSOURCES does not exist."
+      echo "Creating $DEBIANSOURCES and adding the following:"
+      cat <<EOF | sudo tee -a $DEBIANSOURCES
 Types: deb
 URIs: https://deb.debian.org/debian
 Suites: trixie trixie-updates
@@ -95,6 +160,7 @@ Suites: trixie-security
 Components: main non-free-firmware
 Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 EOF
+    fi
   fi
 fi
 
@@ -108,7 +174,7 @@ gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profi
 
 logo
 echo
-if [ $(dpkg -l | grep "^ii  mint-" | wc -l) -eq 0 ]; then
+if [ "$INSTALL_THEMES" = true ] && [ "$UBUNTU_MODE" = false ] && [ $(dpkg -l | grep "^ii  mint-" | wc -l) -eq 0 ]; then
   display "tte waves" "Installing themes"
   MINTLIST="/etc/apt/sources.list.d/mint.list"
   MINTKEY="linuxmint-keyring_2022.06.21_all.deb"
@@ -128,29 +194,53 @@ if [ $(dpkg -l | grep "^ii  mint-" | wc -l) -eq 0 ]; then
   sudo apt update
   echo
   sudo apt -y purge linuxmint-keyring
+elif [ "$INSTALL_THEMES" = true ] && [ "$UBUNTU_MODE" = true ]; then
+  display "tte waves" "Installing themes for Ubuntu"
+  # Install Nordic theme for Ubuntu
+  sudo apt -y install papirus-icon-theme
+  # Nordic theme needs to be installed from GitHub
+  NORDIC_VERSION="2.2.0"
+  NORDIC_URL="https://github.com/EliverLara/Nordic/releases/download/v${NORDIC_VERSION}/Nordic.tar.xz"
+  curl -LO $NORDIC_URL
+  sudo tar -xf Nordic.tar.xz -C /usr/share/themes/
+  rm -f Nordic.tar.xz
 fi
 
-display "tte rain" "Changing wallpaper"
-mkdir -p ~/.config/$PROJECT_LOWER/current/
-mkdir -p ~/.config/$PROJECT_LOWER/themes/
-ln -sf ~/.local/share/$PROJECT_LOWER/themes/$PROJECT_LOWER ~/.config/$PROJECT_LOWER/themes/$PROJECT_LOWER
-ln -sf ~/.config/$PROJECT_LOWER/themes/$PROJECT_LOWER ~/.config/$PROJECT_LOWER/current/theme
-ln -sf ~/.config/$PROJECT_LOWER/current/theme/backgrounds/salty_mountains.png ~/.config/$PROJECT_LOWER/current/background
-BACKGROUND=~/.config/$PROJECT_LOWER/current/background
-gsettings set org.cinnamon.desktop.background picture-uri "'file://$BACKGROUND'"
+if [ "$REPLACE_BACKGROUND" = true ]; then
+  display "tte rain" "Changing wallpaper"
+  mkdir -p ~/.config/$PROJECT_LOWER/current/
+  mkdir -p ~/.config/$PROJECT_LOWER/themes/
+  ln -sf ~/.local/share/$PROJECT_LOWER/themes/$PROJECT_LOWER ~/.config/$PROJECT_LOWER/themes/$PROJECT_LOWER
+  ln -sf ~/.config/$PROJECT_LOWER/themes/$PROJECT_LOWER ~/.config/$PROJECT_LOWER/current/theme
+  ln -sf ~/.config/$PROJECT_LOWER/current/theme/backgrounds/salty_mountains.png ~/.config/$PROJECT_LOWER/current/background
+  BACKGROUND=~/.config/$PROJECT_LOWER/current/background
+  gsettings set org.cinnamon.desktop.background picture-uri "'file://$BACKGROUND'"
+fi
 
 display "tte rain" "Setting Cinnamon theme"
-gsettings set org.cinnamon.theme name "'Mint-Y-Dark-Aqua'"
+if [ "$UBUNTU_MODE" = true ]; then
+  gsettings set org.cinnamon.theme name "'Nordic'"
+else
+  gsettings set org.cinnamon.theme name "'Mint-Y-Dark-Aqua'"
+fi
 
 display "tte rain" "Setting cursor theme"
 sudo apt -y install bibata-cursor-theme
 gsettings set org.cinnamon.desktop.interface cursor-theme "'Bibata-Modern-Classic'"
 
 display "tte rain" "Setting GTK theme"
-gsettings set org.cinnamon.desktop.interface gtk-theme "'Mint-Y-Dark-Aqua'"
+if [ "$UBUNTU_MODE" = true ]; then
+  gsettings set org.cinnamon.desktop.interface gtk-theme "'Nordic'"
+else
+  gsettings set org.cinnamon.desktop.interface gtk-theme "'Mint-Y-Dark-Aqua'"
+fi
 
 display "tte rain" "Setting icon theme"
-gsettings set org.cinnamon.desktop.interface icon-theme "'Mint-Y-Sand'"
+if [ "$UBUNTU_MODE" = true ]; then
+  gsettings set org.cinnamon.desktop.interface icon-theme "'Papirus-Dark'"
+else
+  gsettings set org.cinnamon.desktop.interface icon-theme "'Mint-Y-Sand'"
+fi
 
 display "tte rain" "Setting alttab switcher style to coverflow"
 gsettings set org.cinnamon alttab-switcher-style "'coverflow'"
@@ -173,12 +263,18 @@ fi
 
 display "tte rain" "Installing new apps if unnecessary"
 sudo apt update
-sudo DEBIAN_FRONTEND=noninteractive apt -y install alacritty binutils btop chromium curl eza fzf git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting
+if [ "$UBUNTU_MODE" = true ]; then
+  # Ubuntu-specific package names
+  sudo DEBIAN_FRONTEND=noninteractive apt -y install $PACKAGES_TO_INSTALL_UBUNTU
+else
+  # Debian package names
+  sudo DEBIAN_FRONTEND=noninteractive apt -y install $PACKAGES_TO_INSTALL
+fi
 
 display "tte rain" "Setting alacritty as default terminal emulator"
 gsettings set org.cinnamon.desktop.default-applications.terminal exec "'alacritty'"
 
-if [ ! -f ~/.local/share/fonts/CaskaydiaMonoNerdFont-Regular.ttf ]; then
+if [ "$INSTALL_FONTS" = true ] && [ ! -f ~/.local/share/fonts/CaskaydiaMonoNerdFont-Regular.ttf ]; then
   display "tte rain" "Configuring alacritty with Caskyadia Nerd Font"
   wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/CascadiaMono.zip
   unzip CascadiaMono.zip -d ~/.local/share/fonts
@@ -325,7 +421,11 @@ gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/d
 # custom-1
 echo "Super+B for browser"
 gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom-1/ name "Chromium"
-gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom-1/ command "/usr/bin/chromium"
+if [ "$UBUNTU_MODE" = true ]; then
+  gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom-1/ command "/usr/bin/chromium-browser"
+else
+  gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom-1/ command "/usr/bin/chromium"
+fi
 gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom-1/ binding "['<Super>B']"
 # custom-2
 echo "Super+Return for terminal (alacritty)"
@@ -345,7 +445,11 @@ gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/d
 # custom-5
 echo "Super+K to show all keyboard bindings"
 gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom-5/ name "Keyboard bindings"
-gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom-5/ command "/usr/bin/chromium https://github.com/dougburks/ohmydebn?tab=readme-ov-file#hotkeys"
+if [ "$UBUNTU_MODE" = true ]; then
+  gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom-5/ command "/usr/bin/chromium-browser https://github.com/dougburks/ohmydebn?tab=readme-ov-file#hotkeys"
+else
+  gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom-5/ command "/usr/bin/chromium https://github.com/dougburks/ohmydebn?tab=readme-ov-file#hotkeys"
+fi
 gsettings set org.cinnamon.desktop.keybindings.custom-keybinding:/org/cinnamon/desktop/keybindings/custom-keybindings/custom-5/ binding "['<Super>K']"
 # custom-6
 echo "Super+T to launch btop"
@@ -373,12 +477,12 @@ if pgrep -x cinnamon >/dev/null; then
   /usr/bin/cinnamon --replace >/dev/null 2>&1 &
 fi
 
-if [ "$NO_UNINSTALL" = false ]; then
+if [ "$NO_UNINSTALL" = false ] && [ "$REMOVE_PACKAGES" = true ]; then
   display "tte rain" "Removing any unnecessary packages"
-  sudo apt -y purge brasero firefox* thunderbird gnome-chess gnome-games goldendict-ng hexchat hoichess pidgin remmina transmission* x11vnc
+  sudo apt -y purge $PACKAGES_TO_REMOVE
   sudo apt -y autoremove
 else
-  display "tte rain" "Skipping package removal (--no-uninstall mode)"
+  display "tte rain" "Skipping package removal (--no-uninstall mode or disabled in config)"
 fi
 
 display "tte rain" "Installing any available updates"

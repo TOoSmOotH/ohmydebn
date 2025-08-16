@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OhMyDebn Configurator</title>
+    <style>
+        :root {
+            --bg-dark: #1e1e2e;
+            --bg-medium: #313244;
+            --bg-light: #45475a;
+            --text: #cdd6f4;
+            --text-dim: #a6adc8;
+            --accent: #89b4fa;
+            --accent-hover: #74c7ec;
+            --success: #a6e3a1;
+            --danger: #f38ba8;
+            --warning: #f9e2af;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--bg-light);
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            padding: 1rem 2rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            color: var(--text);
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            background: var(--bg-medium);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .option-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .option-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-light);
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .package-list {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            min-height: 60px;
+        }
+
+        .package-item {
+            background: var(--bg-medium);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .package-item:hover {
+            background: var(--accent);
+            color: var(--bg-dark);
+        }
+
+        .package-item button {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .package-item:hover button {
+            color: var(--bg-dark);
+        }
+
+        .add-package {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .add-package input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: var(--bg-light);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .add-package input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-medium);
+        }
+
+        .starship-preview {
+            background: #000;
+            color: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .color-picker input[type="color"] {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .export-section {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        pre {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        .help-text {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .theme-card {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .theme-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .theme-card.selected {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: var(--bg-dark);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            padding: 2rem;
+        }
+
+        .modal-content {
+            background: var(--bg-medium);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            border-radius: 12px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-dim);
+        }
+
+        .close-modal:hover {
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 OhMyDebn Configurator</h1>
+        
+        <div class="section" style="margin-bottom: 2rem;">
+            <h2>📂 Load Existing Configuration</h2>
+            <p class="help-text">Upload your existing configuration files to modify them</p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <div>
+                    <label class="btn btn-secondary" style="cursor: pointer;">
+                        Upload ohmydebn.conf
+                        <input type="file" id="uploadConfig" accept=".conf" style="display: none;" onchange="loadConfigFile(event)">
+                    </label>
+                </div>
+                <div>
+                    <label class="btn btn-secondary" style="cursor: pointer;">
+                        Upload starship.toml
+                        <input type="file" id="uploadStarship" accept=".toml" style="display: none;" onchange="loadStarshipFile(event)">
+                    </label>
+                </div>
+                <div>
+                    <label class="btn btn-secondary" style="cursor: pointer;">
+                        Upload alacritty.toml
+                        <input type="file" id="uploadAlacritty" accept=".toml" style="display: none;" onchange="loadAlacrittyFile(event)">
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section" style="margin-bottom: 2rem; text-align: center;">
+            <h2>Select Your Operating System</h2>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 2rem;">
+                <label style="font-size: 1.2rem; color: var(--accent);">Debian</label>
+                <label class="switch" style="width: 80px; height: 40px;">
+                    <input type="checkbox" id="osToggle" onchange="toggleOS()">
+                    <span class="slider" style="background-color: var(--accent);"></span>
+                </label>
+                <label style="font-size: 1.2rem; color: var(--accent);">Ubuntu</label>
+            </div>
+            <p class="help-text" id="osDescription" style="margin-top: 1rem;">Currently configured for: Debian</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('general')">General Settings</button>
+            <button class="tab" onclick="showTab('packages')">Packages</button>
+            <button class="tab" onclick="showTab('shell')">Shell Themes</button>
+            <button class="tab" onclick="showTab('export')">Export Config</button>
+        </div>
+
+        <!-- General Settings Tab -->
+        <div id="general" class="tab-content active">
+            <div class="section">
+                <h2>🖼️ Appearance</h2>
+                <div class="option-group">
+                    <label>
+                        Replace Desktop Background
+                        <label class="switch">
+                            <input type="checkbox" id="replaceBackground" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                    <p class="help-text">Replace your current wallpaper with OhMyDebn's default</p>
+                </div>
+                
+                <div class="option-group">
+                    <label>
+                        Install Themes
+                        <label class="switch">
+                            <input type="checkbox" id="installThemes" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                    <p class="help-text">Install Mint themes (Debian) or Nordic theme (Ubuntu)</p>
+                </div>
+                
+                <div class="option-group">
+                    <label>
+                        Install Nerd Fonts
+                        <label class="switch">
+                            <input type="checkbox" id="installFonts" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                    <p class="help-text">Install CaskaydiaMono Nerd Font for terminal</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🧹 System Cleanup</h2>
+                <div class="option-group">
+                    <label>
+                        Remove Unnecessary Packages
+                        <label class="switch">
+                            <input type="checkbox" id="removePackages" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                    <p class="help-text">Remove Firefox, Thunderbird, and other default apps</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Packages Tab -->
+        <div id="packages" class="tab-content">
+            <div class="section" id="debianPackagesSection">
+                <h2>📦 Packages to Install (Debian)</h2>
+                <div class="package-list" id="debianPackages"></div>
+                <div class="add-package">
+                    <input type="text" id="debianPackageInput" placeholder="Enter package name">
+                    <button class="btn" onclick="addPackage('debian')">Add Package</button>
+                    <button class="btn btn-secondary" onclick="restoreDefaultPackages('debian')">Restore Defaults</button>
+                </div>
+            </div>
+
+            <div class="section" id="ubuntuPackagesSection" style="display: none;">
+                <h2>📦 Packages to Install (Ubuntu)</h2>
+                <div class="package-list" id="ubuntuPackages"></div>
+                <div class="add-package">
+                    <input type="text" id="ubuntuPackageInput" placeholder="Enter package name">
+                    <button class="btn" onclick="addPackage('ubuntu')">Add Package</button>
+                    <button class="btn btn-secondary" onclick="restoreDefaultPackages('ubuntu')">Restore Defaults</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🗑️ Packages to Remove</h2>
+                <div class="package-list" id="removePackages"></div>
+                <div class="add-package">
+                    <input type="text" id="removePackageInput" placeholder="Enter package name">
+                    <button class="btn" onclick="addPackage('remove')">Add Package</button>
+                    <button class="btn btn-secondary" onclick="restoreDefaultPackages('remove')">Restore Defaults</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shell Themes Tab -->
+        <div id="shell" class="tab-content">
+            <div class="section">
+                <h2>🚀 Starship Prompt Configuration</h2>
+                
+                <div class="option-group">
+                    <h3>OhMyDebn Starship Theme</h3>
+                    <p class="help-text">Powerline style prompt with customizable colors</p>
+                </div>
+
+                <div class="option-group">
+                    <label>Prompt Colors</label>
+                    <div class="color-picker">
+                        <label>Directory Color:</label>
+                        <input type="color" id="dirColor" value="#89b4fa">
+                    </div>
+                    <div class="color-picker">
+                        <label>Git Branch Color:</label>
+                        <input type="color" id="gitColor" value="#f38ba8">
+                    </div>
+                    <div class="color-picker">
+                        <label>Error Color:</label>
+                        <input type="color" id="errorColor" value="#f38ba8">
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn btn-secondary" onclick="restoreDefaultColors()">Restore Default Colors</button>
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <label>
+                        <input type="checkbox" id="showBattery" checked> Show Battery Status
+                    </label>
+                    <label>
+                        <input type="checkbox" id="showTime" checked> Show Time
+                    </label>
+                    <label>
+                        <input type="checkbox" id="showDocker"> Show Docker Context
+                    </label>
+                    <label>
+                        <input type="checkbox" id="showKubernetes"> Show Kubernetes Context
+                    </label>
+                </div>
+
+                <div class="option-group">
+                    <label>Prompt Preview</label>
+                    <div class="starship-preview" id="starshipPreview">
+                        <span style="background: #89b4fa; color: #11111b; padding: 2px 8px; border-radius: 4px 0 0 4px; font-weight: 600;">⚪ doug ~/ohmydebn</span><span style="color: #89b4fa; background: #f38ba8; font-size: 1.3em; line-height: 1; vertical-align: middle;">⮀</span><span style="background: #f38ba8; color: #11111b; padding: 2px 8px; border-radius: 0 4px 4px 0; font-weight: 600;"> dev</span> <span style="color: #a6e3a1; font-weight: bold;">❯</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🖥️ Alacritty Terminal Colors</h2>
+                
+                <div class="option-group">
+                    <h3 id="currentThemeName">Catppuccin Mocha Theme</h3>
+                    <p class="help-text">Customize your terminal color scheme</p>
+                </div>
+
+                <div class="option-group">
+                    <label>Background & Text</label>
+                    <div class="color-picker">
+                        <label>Background:</label>
+                        <input type="color" id="termBg" value="#1e1e2e">
+                    </div>
+                    <div class="color-picker">
+                        <label>Foreground (Text):</label>
+                        <input type="color" id="termFg" value="#cdd6f4">
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <label>Primary Colors</label>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                        <div class="color-picker">
+                            <label>Black:</label>
+                            <input type="color" id="termBlack" value="#45475a">
+                        </div>
+                        <div class="color-picker">
+                            <label>Red:</label>
+                            <input type="color" id="termRed" value="#f38ba8">
+                        </div>
+                        <div class="color-picker">
+                            <label>Green:</label>
+                            <input type="color" id="termGreen" value="#a6e3a1">
+                        </div>
+                        <div class="color-picker">
+                            <label>Yellow:</label>
+                            <input type="color" id="termYellow" value="#f9e2af">
+                        </div>
+                        <div class="color-picker">
+                            <label>Blue:</label>
+                            <input type="color" id="termBlue" value="#89b4fa">
+                        </div>
+                        <div class="color-picker">
+                            <label>Magenta:</label>
+                            <input type="color" id="termMagenta" value="#f5c2e7">
+                        </div>
+                        <div class="color-picker">
+                            <label>Cyan:</label>
+                            <input type="color" id="termCyan" value="#94e2d5">
+                        </div>
+                        <div class="color-picker">
+                            <label>White:</label>
+                            <input type="color" id="termWhite" value="#bac2de">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <label>Terminal Settings</label>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                        <div>
+                            <label>Opacity (0.0-1.0):</label>
+                            <input type="number" id="termOpacity" value="0.97" min="0" max="1" step="0.01" style="width: 100%; padding: 0.5rem; background: var(--bg-light); border: 2px solid transparent; border-radius: 8px; color: var(--text);">
+                        </div>
+                        <div>
+                            <label>Font Size:</label>
+                            <input type="number" id="fontSize" value="12" min="8" max="24" step="1" style="width: 100%; padding: 0.5rem; background: var(--bg-light); border: 2px solid transparent; border-radius: 8px; color: var(--text);">
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn btn-secondary" onclick="restoreDefaultTerminalColors()">Restore Default Terminal Colors</button>
+                    </div>
+                </div>
+
+                <div class="option-group">
+                    <label>Terminal Preview</label>
+                    <div class="starship-preview" id="terminalPreview" style="padding: 1rem;">
+                        <div style="color: #a6e3a1;">❯ ls</div>
+                        <div><span style="color: #89b4fa;">bin/</span>  <span style="color: #89b4fa;">config/</span>  <span style="color: #a6e3a1;">install.sh</span>  <span style="color: #f9e2af;">README.md</span></div>
+                        <div style="color: #a6e3a1;">❯ <span style="color: #cdd6f4;">echo</span> <span style="color: #f38ba8;">"Hello, OhMyDebn!"</span></div>
+                        <div>Hello, OhMyDebn!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Tab -->
+        <div id="export" class="tab-content">
+            <div class="section export-section">
+                <h2>💾 Export Configuration</h2>
+                <p>Generate your customized configuration files</p>
+                
+                <div class="export-buttons">
+                    <button class="btn" onclick="generateConfig()">Generate Config</button>
+                    <button class="btn btn-secondary" onclick="downloadConfig()">Download Config</button>
+                    <button class="btn btn-secondary" onclick="copyConfig()">Copy to Clipboard</button>
+                </div>
+
+                <div id="generatedConfig" style="display: none;">
+                    <h3>ohmydebn.conf</h3>
+                    <pre id="configOutput"></pre>
+                    
+                    <h3>starship.toml</h3>
+                    <pre id="starshipOutput"></pre>
+                    
+                    <h3>alacritty.toml</h3>
+                    <pre id="alacrittyOutput"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2>Configuration Copied!</h2>
+            <p>The configuration has been copied to your clipboard. Save the files to the appropriate locations:</p>
+            <ul>
+                <li><code>~/.config/ohmydebn/ohmydebn.conf</code></li>
+                <li><code>~/.config/starship.toml</code></li>
+                <li><code>~/.config/alacritty/alacritty.toml</code></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Default package lists
+        const defaultPackages = {
+            debian: ['alacritty', 'binutils', 'btop', 'chromium', 'curl', 'eza', 'fzf', 'git', 'gimp', 'golang', 'gvfs-backends', 'htop', 'iperf3', 'keepassxc', 'neovim', 'openvpn', 'pdftk-java', 'python-is-python3', 'ripgrep', 'ristretto', 'rofi', 'screenfetch', 'starship', 'vim', 'wget', 'xdotool', 'yq', 'zoxide', 'zsh', 'zsh-autosuggestions', 'zsh-syntax-highlighting'],
+            ubuntu: ['alacritty', 'binutils', 'btop', 'chromium-browser', 'curl', 'eza', 'fzf', 'git', 'gimp', 'golang', 'gvfs-backends', 'htop', 'iperf3', 'keepassxc', 'neovim', 'openvpn', 'pdftk-java', 'python-is-python3', 'ripgrep', 'ristretto', 'rofi', 'screenfetch', 'starship', 'vim', 'wget', 'xdotool', 'yq', 'zoxide', 'zsh', 'zsh-autosuggestions', 'zsh-syntax-highlighting'],
+            remove: ['brasero', 'firefox*', 'thunderbird', 'gnome-chess', 'gnome-games', 'goldendict-ng', 'hexchat', 'hoichess', 'pidgin', 'remmina', 'transmission*', 'x11vnc']
+        };
+
+        let packages = JSON.parse(JSON.stringify(defaultPackages));
+        let isUbuntu = false;
+
+        // Nordic theme colors
+        const nordicColors = {
+            background: '#2e3440',
+            foreground: '#d8dee9',
+            black: '#3b4252',
+            red: '#bf616a',
+            green: '#a3be8c',
+            yellow: '#ebcb8b',
+            blue: '#81a1c1',
+            magenta: '#b48ead',
+            cyan: '#88c0d0',
+            white: '#e5e9f0'
+        };
+
+        // Catppuccin theme colors (default)
+        const catppuccinColors = {
+            background: '#1e1e2e',
+            foreground: '#cdd6f4',
+            black: '#45475a',
+            red: '#f38ba8',
+            green: '#a6e3a1',
+            yellow: '#f9e2af',
+            blue: '#89b4fa',
+            magenta: '#f5c2e7',
+            cyan: '#94e2d5',
+            white: '#bac2de'
+        };
+
+        // Initialize package lists
+        function initializePackageLists() {
+            renderPackageList('debian', packages.debian);
+            renderPackageList('ubuntu', packages.ubuntu);
+            renderPackageList('remove', packages.remove);
+        }
+
+        // Render package list
+        function renderPackageList(type, packageList) {
+            const container = document.getElementById(type + 'Packages');
+            container.innerHTML = '';
+            
+            packageList.forEach(pkg => {
+                const item = document.createElement('div');
+                item.className = 'package-item';
+                item.innerHTML = `
+                    ${pkg}
+                    <button onclick="removePackage('${type}', '${pkg}')">&times;</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Add package
+        function addPackage(type) {
+            const input = document.getElementById(type + 'PackageInput');
+            const value = input.value.trim();
+            
+            if (value && !packages[type].includes(value)) {
+                packages[type].push(value);
+                renderPackageList(type, packages[type]);
+                input.value = '';
+            }
+        }
+
+        // Remove package
+        function removePackage(type, pkg) {
+            packages[type] = packages[type].filter(p => p !== pkg);
+            renderPackageList(type, packages[type]);
+        }
+
+        // Restore default packages
+        function restoreDefaultPackages(type) {
+            packages[type] = [...defaultPackages[type]];
+            renderPackageList(type, packages[type]);
+        }
+
+        // Tab switching
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Update Starship preview
+        function updateStarshipPreview() {
+            const preview = document.getElementById('starshipPreview');
+            const dirColor = document.getElementById('dirColor').value;
+            const gitColor = document.getElementById('gitColor').value;
+            const errorColor = document.getElementById('errorColor').value;
+            
+            // OhMyDebn default powerline style with custom colors
+            preview.innerHTML = `
+                <span style="background: ${dirColor}; color: #11111b; padding: 2px 8px; border-radius: 4px 0 0 4px; font-weight: 600;">⚪ doug ~/ohmydebn</span><span style="color: ${dirColor}; background: ${gitColor}; font-size: 1.3em; line-height: 1; vertical-align: middle;">⮀</span><span style="background: ${gitColor}; color: #11111b; padding: 2px 8px; border-radius: 0 4px 4px 0; font-weight: 600;"> dev</span> <span style="color: #a6e3a1; font-weight: bold;">❯</span>
+            `;
+        }
+
+        // Toggle OS
+        function toggleOS() {
+            isUbuntu = document.getElementById('osToggle').checked;
+            const osDesc = document.getElementById('osDescription');
+            const debianSection = document.getElementById('debianPackagesSection');
+            const ubuntuSection = document.getElementById('ubuntuPackagesSection');
+            const themeName = document.getElementById('currentThemeName');
+            
+            if (isUbuntu) {
+                osDesc.textContent = 'Currently configured for: Ubuntu';
+                debianSection.style.display = 'none';
+                ubuntuSection.style.display = 'block';
+                if (themeName) themeName.textContent = 'Nordic Theme';
+                // Apply Nordic colors
+                applyThemeColors(nordicColors);
+            } else {
+                osDesc.textContent = 'Currently configured for: Debian';
+                debianSection.style.display = 'block';
+                ubuntuSection.style.display = 'none';
+                if (themeName) themeName.textContent = 'Catppuccin Mocha Theme';
+                // Apply Catppuccin colors
+                applyThemeColors(catppuccinColors);
+            }
+        }
+
+        // Apply theme colors
+        function applyThemeColors(theme) {
+            // Update Starship colors
+            document.getElementById('dirColor').value = theme.blue;
+            document.getElementById('gitColor').value = theme.red;
+            document.getElementById('errorColor').value = theme.red;
+            
+            // Update terminal colors
+            document.getElementById('termBg').value = theme.background;
+            document.getElementById('termFg').value = theme.foreground;
+            document.getElementById('termBlack').value = theme.black;
+            document.getElementById('termRed').value = theme.red;
+            document.getElementById('termGreen').value = theme.green;
+            document.getElementById('termYellow').value = theme.yellow;
+            document.getElementById('termBlue').value = theme.blue;
+            document.getElementById('termMagenta').value = theme.magenta;
+            document.getElementById('termCyan').value = theme.cyan;
+            document.getElementById('termWhite').value = theme.white;
+            
+            // Update previews
+            updateStarshipPreview();
+            updateTerminalPreview();
+        }
+
+        // Restore default colors
+        function restoreDefaultColors() {
+            const theme = isUbuntu ? nordicColors : catppuccinColors;
+            document.getElementById('dirColor').value = theme.blue;
+            document.getElementById('gitColor').value = theme.red;
+            document.getElementById('errorColor').value = theme.red;
+            updateStarshipPreview();
+        }
+
+        // Restore default terminal colors
+        function restoreDefaultTerminalColors() {
+            const theme = isUbuntu ? nordicColors : catppuccinColors;
+            document.getElementById('termBg').value = theme.background;
+            document.getElementById('termFg').value = theme.foreground;
+            document.getElementById('termBlack').value = theme.black;
+            document.getElementById('termRed').value = theme.red;
+            document.getElementById('termGreen').value = theme.green;
+            document.getElementById('termYellow').value = theme.yellow;
+            document.getElementById('termBlue').value = theme.blue;
+            document.getElementById('termMagenta').value = theme.magenta;
+            document.getElementById('termCyan').value = theme.cyan;
+            document.getElementById('termWhite').value = theme.white;
+            document.getElementById('termOpacity').value = '0.97';
+            document.getElementById('fontSize').value = '12';
+            updateTerminalPreview();
+        }
+
+        // Update terminal preview
+        function updateTerminalPreview() {
+            const preview = document.getElementById('terminalPreview');
+            const bg = document.getElementById('termBg').value;
+            const fg = document.getElementById('termFg').value;
+            const green = document.getElementById('termGreen').value;
+            const blue = document.getElementById('termBlue').value;
+            const red = document.getElementById('termRed').value;
+            const yellow = document.getElementById('termYellow').value;
+            
+            preview.style.backgroundColor = bg;
+            preview.style.color = fg;
+            
+            preview.innerHTML = `
+                <div style="color: ${green};">❯ ls</div>
+                <div><span style="color: ${blue};">bin/</span>  <span style="color: ${blue};">config/</span>  <span style="color: ${green};">install.sh</span>  <span style="color: ${yellow};">README.md</span></div>
+                <div style="color: ${green};">❯ <span style="color: ${fg};">echo</span> <span style="color: ${red};">"Hello, OhMyDebn!"</span></div>
+                <div>Hello, OhMyDebn!</div>
+            `;
+        }
+
+        // Generate configuration
+        function generateConfig() {
+            const config = `# OhMyDebn Configuration File
+# Generated by OhMyDebn Configurator
+# Operating System: ${isUbuntu ? 'Ubuntu' : 'Debian'}
+
+# Whether to replace the desktop background
+REPLACE_BACKGROUND=${document.getElementById('replaceBackground').checked}
+
+# Whether to install themes
+INSTALL_THEMES=${document.getElementById('installThemes').checked}
+
+# Whether to remove unnecessary packages
+REMOVE_PACKAGES=${document.getElementById('removePackages').checked}
+
+# Whether to install Nerd Fonts
+INSTALL_FONTS=${document.getElementById('installFonts').checked}
+
+# Packages to install (space-separated list)
+# For Debian:
+PACKAGES_TO_INSTALL="${packages.debian.join(' ')}"
+
+# For Ubuntu (used when --ubuntu flag is passed):
+PACKAGES_TO_INSTALL_UBUNTU="${packages.ubuntu.join(' ')}"
+
+# Packages to remove (space-separated list)
+PACKAGES_TO_REMOVE="${packages.remove.join(' ')}"`;
+
+            const starshipConfig = generateStarshipConfig();
+            const alacrittyConfig = generateAlacrittyConfig();
+            
+            document.getElementById('configOutput').textContent = config;
+            document.getElementById('starshipOutput').textContent = starshipConfig;
+            document.getElementById('alacrittyOutput').textContent = alacrittyConfig;
+            document.getElementById('generatedConfig').style.display = 'block';
+        }
+
+        // Generate Starship configuration
+        function generateStarshipConfig() {
+            // Always return the OhMyDebn Starship configuration (no other presets)
+            return `"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+[](blue)\
+$os\
+$username\
+[](fg:blue bg:red)\
+$directory\
+[](fg:red bg:blue)\
+$git_branch\
+$git_status\
+[](fg:blue bg:red)\
+$c\
+$rust\
+$golang\
+$nodejs\
+$php\
+$java\
+$kotlin\
+$haskell\
+$python\
+[](fg:red bg:blue)\
+[ ](fg:blue)\
+$cmd_duration\
+$line_break\
+$character"""
+
+palette = 'catppuccin_mocha'
+
+[os]
+disabled = false
+style = "bg:blue fg:crust"
+
+[os.symbols]
+Windows = ""
+Ubuntu = "󰕈"
+SUSE = ""
+Raspbian = "󰐿"
+Mint = "󰣭"
+Macos = "󰀵"
+Manjaro = ""
+Linux = "󰌽"
+Gentoo = "󰣨"
+Fedora = "󰣛"
+Alpine = ""
+Amazon = ""
+Android = ""
+Arch = "󰣇"
+Artix = "󰣇"
+CentOS = ""
+Debian = "󰣚"
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
+
+[username]
+show_always = true
+style_user = "bg:blue fg:crust"
+style_root = "bg:blue fg:crust"
+format = '[ $user]($style)'
+
+[directory]
+style = "bg:red fg:crust"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = " "
+"Developer" = "󰲋 "
+
+[git_branch]
+symbol = ""
+style = "bg:blue"
+format = '[[ $symbol $branch ](fg:crust bg:blue)]($style)'
+
+[git_status]
+style = "bg:blue"
+format = '[[($all_status$ahead_behind )](fg:crust bg:blue)]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:red"
+format = '[[ $symbol( $version) ](fg:crust bg:red)]($style)'
+
+[c]
+symbol = " "
+style = "bg:red"
+format = '[[ $symbol( $version) ](fg:crust bg:red)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:red"
+format = '[[ $symbol( $version) ](fg:crust bg:red)]($style)'
+
+[golang]
+symbol = ""
+style = "bg:red"
+format = '[[ $symbol( $version) ](fg:crust bg:red)]($style)'
+
+[php]
+symbol = ""
+style = "bg:red"
+format = '[[ $symbol( $version) ](fg:crust bg:red)]($style)'
+
+[java]
+symbol = " "
+style = "bg:red"
+format = '[[ $symbol( $version) ](fg:crust bg:red)]($style)'
+
+[kotlin]
+symbol = ""
+style = "bg:red"
+format = '[[ $symbol( $version) ](fg:crust bg:red)]($style)'
+
+[haskell]
+symbol = ""
+style = "bg:red"
+format = '[[ $symbol( $version) ](fg:crust bg:red)]($style)'
+
+[python]
+symbol = ""
+style = "bg:red"
+format = '[[ $symbol( $version)(\\($virtualenv\\)) ](fg:crust bg:red)]($style)'
+
+[docker_context]
+symbol = ""
+style = "bg:sapphire"
+format = '[[ $symbol( $context) ](fg:crust bg:sapphire)]($style)'
+
+[conda]
+symbol = "  "
+style = "fg:crust bg:blue"
+format = '[$symbol$environment ]($style)'
+ignore_base = false
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:lavender"
+format = '[[  $time ](fg:crust bg:lavender)]($style)'
+
+[line_break]
+disabled = true
+
+[character]
+disabled = false
+success_symbol = '[❯](bold fg:green)'
+error_symbol = '[❯](bold fg:red)'
+vimcmd_symbol = '[❮](bold fg:green)'
+vimcmd_replace_one_symbol = '[❮](bold fg:lavender)'
+vimcmd_replace_symbol = '[❮](bold fg:lavender)'
+vimcmd_visual_symbol = '[❮](bold fg:yellow)'
+
+[cmd_duration]
+show_milliseconds = true
+format = " in $duration "
+style = "bg:lavender"
+disabled = false
+show_notifications = true
+min_time_to_notify = 45000
+
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"`;
+        }
+
+        // Generate Alacritty configuration
+        function generateAlacrittyConfig() {
+            const bg = document.getElementById('termBg').value;
+            const fg = document.getElementById('termFg').value;
+            const black = document.getElementById('termBlack').value;
+            const red = document.getElementById('termRed').value;
+            const green = document.getElementById('termGreen').value;
+            const yellow = document.getElementById('termYellow').value;
+            const blue = document.getElementById('termBlue').value;
+            const magenta = document.getElementById('termMagenta').value;
+            const cyan = document.getElementById('termCyan').value;
+            const white = document.getElementById('termWhite').value;
+            const opacity = document.getElementById('termOpacity').value;
+            const fontSize = document.getElementById('fontSize').value;
+            
+            return `[env]
+TERM = "xterm-256color"
+
+[window]
+opacity = ${opacity}
+padding.x = 14
+padding.y = 14
+decorations = "Full"
+
+[font]
+normal = { family = "CaskaydiaMono Nerd Font", style = "Regular" }
+bold = { family = "CaskaydiaMono Nerd Font", style = "Bold" }
+italic = { family = "CaskaydiaMono Nerd Font", style = "Italic" }
+size = ${fontSize}
+
+[colors.primary]
+background = "${bg}"
+foreground = "${fg}"
+
+[colors.normal]
+black = "${black}"
+red = "${red}"
+green = "${green}"
+yellow = "${yellow}"
+blue = "${blue}"
+magenta = "${magenta}"
+cyan = "${cyan}"
+white = "${white}"
+
+[colors.bright]
+black = "#585b70"
+red = "#f38ba8"
+green = "#a6e3a1"
+yellow = "#f9e2af"
+blue = "#89b4fa"
+magenta = "#f5c2e7"
+cyan = "#94e2d5"
+white = "#a6adc8"
+
+[terminal]
+shell = "/usr/bin/zsh"`;
+        }
+
+        // Download configuration
+        function downloadConfig() {
+            generateConfig();
+            
+            const configText = document.getElementById('configOutput').textContent;
+            const starshipText = document.getElementById('starshipOutput').textContent;
+            const alacrittyText = document.getElementById('alacrittyOutput').textContent;
+            
+            // Download ohmydebn.conf
+            const configBlob = new Blob([configText], { type: 'text/plain' });
+            const configUrl = URL.createObjectURL(configBlob);
+            const configLink = document.createElement('a');
+            configLink.href = configUrl;
+            configLink.download = 'ohmydebn.conf';
+            configLink.click();
+            
+            // Download starship.toml
+            setTimeout(() => {
+                const starshipBlob = new Blob([starshipText], { type: 'text/plain' });
+                const starshipUrl = URL.createObjectURL(starshipBlob);
+                const starshipLink = document.createElement('a');
+                starshipLink.href = starshipUrl;
+                starshipLink.download = 'starship.toml';
+                starshipLink.click();
+            }, 500);
+            
+            // Download alacritty.toml
+            setTimeout(() => {
+                const alacrittyBlob = new Blob([alacrittyText], { type: 'text/plain' });
+                const alacrittyUrl = URL.createObjectURL(alacrittyBlob);
+                const alacrittyLink = document.createElement('a');
+                alacrittyLink.href = alacrittyUrl;
+                alacrittyLink.download = 'alacritty.toml';
+                alacrittyLink.click();
+            }, 1000);
+        }
+
+        // Copy configuration to clipboard
+        function copyConfig() {
+            generateConfig();
+            
+            const configText = document.getElementById('configOutput').textContent;
+            const starshipText = document.getElementById('starshipOutput').textContent;
+            const alacrittyText = document.getElementById('alacrittyOutput').textContent;
+            
+            const fullText = `# ohmydebn.conf
+${configText}
+
+# starship.toml
+${starshipText}
+
+# alacritty.toml
+${alacrittyText}`;
+            
+            navigator.clipboard.writeText(fullText).then(() => {
+                document.getElementById('modal').style.display = 'block';
+            });
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // Load config file
+        function loadConfigFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    parseConfigFile(content);
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Parse config file
+        function parseConfigFile(content) {
+            const lines = content.split('\n');
+            lines.forEach(line => {
+                line = line.trim();
+                if (line && !line.startsWith('#')) {
+                    const [key, value] = line.split('=').map(s => s.trim());
+                    
+                    switch(key) {
+                        case 'REPLACE_BACKGROUND':
+                            document.getElementById('replaceBackground').checked = value === 'true';
+                            break;
+                        case 'INSTALL_THEMES':
+                            document.getElementById('installThemes').checked = value === 'true';
+                            break;
+                        case 'REMOVE_PACKAGES':
+                            document.getElementById('removePackages').checked = value === 'true';
+                            break;
+                        case 'INSTALL_FONTS':
+                            document.getElementById('installFonts').checked = value === 'true';
+                            break;
+                        case 'PACKAGES_TO_INSTALL':
+                            packages.debian = value.replace(/['"]/g, '').split(' ').filter(p => p);
+                            renderPackageList('debian', packages.debian);
+                            break;
+                        case 'PACKAGES_TO_INSTALL_UBUNTU':
+                            packages.ubuntu = value.replace(/['"]/g, '').split(' ').filter(p => p);
+                            renderPackageList('ubuntu', packages.ubuntu);
+                            break;
+                        case 'PACKAGES_TO_REMOVE':
+                            packages.remove = value.replace(/['"]/g, '').split(' ').filter(p => p);
+                            renderPackageList('remove', packages.remove);
+                            break;
+                    }
+                }
+            });
+            alert('Configuration loaded successfully!');
+        }
+
+        // Load Starship file
+        function loadStarshipFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // For now, just alert that it was loaded
+                    // In a real implementation, you'd parse the TOML and update the UI
+                    alert('Starship configuration loaded! Note: Custom color extraction from TOML is not yet implemented.');
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Load Alacritty file
+        function loadAlacrittyFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    parseAlacrittyFile(content);
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Parse Alacritty file
+        function parseAlacrittyFile(content) {
+            // Simple TOML parsing for the values we care about
+            const lines = content.split('\n');
+            let currentSection = '';
+            
+            lines.forEach(line => {
+                line = line.trim();
+                
+                // Section headers
+                if (line.startsWith('[')) {
+                    currentSection = line;
+                    return;
+                }
+                
+                // Key-value pairs
+                if (line.includes('=')) {
+                    const [key, value] = line.split('=').map(s => s.trim());
+                    const cleanValue = value.replace(/['"]/g, '');
+                    
+                    // Window opacity
+                    if (currentSection === '[window]' && key === 'opacity') {
+                        document.getElementById('termOpacity').value = cleanValue;
+                    }
+                    
+                    // Font size
+                    if (currentSection === '[font]' && key === 'size') {
+                        document.getElementById('fontSize').value = cleanValue;
+                    }
+                    
+                    // Primary colors
+                    if (currentSection === '[colors.primary]') {
+                        if (key === 'background') {
+                            document.getElementById('termBg').value = cleanValue;
+                        } else if (key === 'foreground') {
+                            document.getElementById('termFg').value = cleanValue;
+                        }
+                    }
+                    
+                    // Normal colors
+                    if (currentSection === '[colors.normal]') {
+                        const colorMap = {
+                            'black': 'termBlack',
+                            'red': 'termRed',
+                            'green': 'termGreen',
+                            'yellow': 'termYellow',
+                            'blue': 'termBlue',
+                            'magenta': 'termMagenta',
+                            'cyan': 'termCyan',
+                            'white': 'termWhite'
+                        };
+                        
+                        if (colorMap[key]) {
+                            document.getElementById(colorMap[key]).value = cleanValue;
+                        }
+                    }
+                }
+            });
+            
+            updateTerminalPreview();
+            alert('Alacritty configuration loaded successfully!');
+        }
+
+        // Add enter key support for package inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            ['debian', 'ubuntu', 'remove'].forEach(type => {
+                document.getElementById(type + 'PackageInput').addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        addPackage(type);
+                    }
+                });
+            });
+            
+            // Initialize color picker listeners
+            ['dirColor', 'gitColor', 'errorColor'].forEach(id => {
+                document.getElementById(id).addEventListener('change', updateStarshipPreview);
+            });
+            
+            // Initialize terminal color listeners
+            ['termBg', 'termFg', 'termBlack', 'termRed', 'termGreen', 'termYellow', 'termBlue', 'termMagenta', 'termCyan', 'termWhite'].forEach(id => {
+                document.getElementById(id).addEventListener('change', updateTerminalPreview);
+            });
+            
+            // Initialize terminal settings listeners
+            ['termOpacity', 'fontSize'].forEach(id => {
+                document.getElementById(id).addEventListener('change', updateTerminalPreview);
+            });
+            
+            initializePackageLists();
+            updateTerminalPreview();
+        });
+    </script>
+</body>
+</html>

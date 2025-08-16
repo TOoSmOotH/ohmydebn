@@ -127,14 +127,38 @@ bash install.sh
 ```
 ## Installation Options
 
-The install script supports the following option:
+The install script supports the following options:
 
 - `--no-uninstall` - installs OhMyDebn without removing existing packages like Firefox, Thunderbird, etc.
+- `--ubuntu` - enables Ubuntu compatibility mode (experimental)
 
 Example:
 ```
 bash install.sh --no-uninstall
 ```
+
+## Configuration
+
+OhMyDebn can be customized through a configuration file at `~/.config/ohmydebn/ohmydebn.conf`. The file is created automatically on first run with default settings.
+
+### Web Configurator
+
+For an easy way to customize your installation, use the **OhMyDebn Configurator**:
+
+1. Open `configurator.html` in your web browser
+2. Customize settings across four tabs:
+   - **General Settings**: Toggle background replacement, themes, fonts
+   - **Packages**: Add/remove packages for installation
+   - **Starship Theme**: Customize your terminal prompt with presets or custom colors
+   - **Export Config**: Generate and download your configuration files
+
+3. Save the generated files to:
+   - `~/.config/ohmydebn/ohmydebn.conf` - Main configuration
+   - `~/.config/starship.toml` - Starship prompt theme
+
+### Manual Configuration
+
+You can also edit the configuration file directly. See `config/ohmydebn.conf.example` for all available options.
 # After Installation
 
 Once installation completes, you can enjoy your new OhMyDebn desktop!

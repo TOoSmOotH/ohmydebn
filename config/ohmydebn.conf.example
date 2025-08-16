@@ -1,0 +1,28 @@
+# OhMyDebn Configuration File
+# Copy this file to ~/.config/ohmydebn/ohmydebn.conf and modify as needed
+
+# Whether to replace the desktop background
+# Set to false if you want to keep your current wallpaper
+REPLACE_BACKGROUND=true
+
+# Whether to install Mint themes
+# Set to false if you already have themes or prefer your current ones
+INSTALL_THEMES=true
+
+# Whether to remove unnecessary packages
+# Set to false if you want to keep Firefox, Thunderbird, etc.
+REMOVE_PACKAGES=true
+
+# Whether to install Nerd Fonts
+# Set to false if you already have fonts or don't need them
+INSTALL_FONTS=true
+
+# Packages to install (space-separated list)
+# For Debian:
+PACKAGES_TO_INSTALL="alacritty binutils btop chromium curl eza fzf git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
+
+# For Ubuntu (used when --ubuntu flag is passed):
+PACKAGES_TO_INSTALL_UBUNTU="alacritty binutils btop chromium-browser curl eza fzf git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
+
+# Packages to remove (space-separated list)
+PACKAGES_TO_REMOVE="brasero firefox* thunderbird gnome-chess gnome-games goldendict-ng hexchat hoichess pidgin remmina transmission* x11vnc"
