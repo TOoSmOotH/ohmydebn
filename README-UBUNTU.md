@@ -2,6 +2,18 @@
 
 OhMyDebn now includes experimental support for Ubuntu with Cinnamon desktop environment.
 
+## Prerequisites
+
+**IMPORTANT**: You must have Cinnamon desktop environment installed before running this script.
+
+To install Cinnamon on Ubuntu:
+```bash
+sudo apt update
+sudo apt install cinnamon-desktop-environment
+```
+
+After installation, log out and select "Cinnamon" from the session menu on the login screen.
+
 ## Usage
 
 To install OhMyDebn on Ubuntu, you MUST use the `--ubuntu` flag:

@@ -100,9 +100,11 @@ Here's an old MacBook from 2014. Apple says it's EOL but OhMyDebn breathes new l
 OhMyDebn requires the following:
 - 2GB RAM minimum
 - 2 CPU cores minimum
-- Debian 13 with Cinnamon desktop
+- Debian 13 or Ubuntu with Cinnamon desktop environment installed
 - user account with sudo privileges
 - ability to connect to Github, package repos, and other Internet sites
+
+**Important**: This script is specifically designed for Cinnamon desktop. It will not work with GNOME, KDE, XFCE, or other desktop environments.
   
 # Warnings
 

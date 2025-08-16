@@ -109,6 +109,30 @@ else
   fi
 fi
 
+# Check for Cinnamon desktop environment
+if ! command -v cinnamon &> /dev/null; then
+  display "cat" "Cinnamon desktop environment not found!
+
+This script requires Cinnamon desktop to be installed.
+Please install Cinnamon first:
+  - Debian: sudo apt install cinnamon-desktop-environment
+  - Ubuntu: sudo apt install cinnamon-desktop-environment
+
+Exiting!"
+  exit 1
+fi
+
+# Also check if we can access Cinnamon settings
+if ! command -v gsettings &> /dev/null; then
+  display "cat" "gsettings command not found!
+
+This is required to configure Cinnamon desktop.
+Please ensure Cinnamon is properly installed.
+
+Exiting!"
+  exit 1
+fi
+
 if [ "$UID" -eq 0 ]; then
 
   display "cat" "Looks like you're running as root.
