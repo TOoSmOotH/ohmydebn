@@ -18,7 +18,7 @@ INSTALL_FONTS=true
 
 # Package lists
 PACKAGES_TO_INSTALL="alacritty binutils btop chromium curl eza fzf git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
-PACKAGES_TO_INSTALL_UBUNTU="alacritty binutils btop chromium-browser curl eza fzf git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
+PACKAGES_TO_INSTALL_UBUNTU="alacritty binutils btop chromium-browser curl eza fzf gedit git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
 PACKAGES_TO_REMOVE="brasero firefox* thunderbird gnome-chess gnome-games goldendict-ng hexchat hoichess pidgin remmina transmission* x11vnc"
 
 # Create config directory if it doesn't exist
@@ -47,7 +47,7 @@ INSTALL_FONTS=true
 PACKAGES_TO_INSTALL="alacritty binutils btop chromium curl eza fzf git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
 
 # For Ubuntu (used when --ubuntu flag is passed):
-PACKAGES_TO_INSTALL_UBUNTU="alacritty binutils btop chromium-browser curl eza fzf git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
+PACKAGES_TO_INSTALL_UBUNTU="alacritty binutils btop chromium-browser curl eza fzf gedit git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
 
 # Packages to remove (space-separated list)
 PACKAGES_TO_REMOVE="brasero firefox* thunderbird gnome-chess gnome-games goldendict-ng hexchat hoichess pidgin remmina transmission* x11vnc"
@@ -273,7 +273,12 @@ display "tte rain" "Configuring alttab switcher for all workspaces"
 gsettings set org.cinnamon alttab-switcher-show-all-workspaces true
 
 display "tte rain" "Configuring gedit"
-gsettings set org.gnome.gedit.preferences.editor highlight-current-line false
+# Check if the schema exists before trying to set it
+if gsettings list-schemas | grep -q "org.gnome.gedit.preferences.editor"; then
+  gsettings set org.gnome.gedit.preferences.editor highlight-current-line false
+else
+  echo "Note: gedit schema not found, it may still be installing..."
+fi
 
 if gsettings get org.cinnamon enabled-applets | grep -q grouped-window-list; then
   display "tte rain" "Changing grouped window list to window list"

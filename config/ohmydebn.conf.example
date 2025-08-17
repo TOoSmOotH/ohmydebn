@@ -22,7 +22,7 @@ INSTALL_FONTS=true
 PACKAGES_TO_INSTALL="alacritty binutils btop chromium curl eza fzf git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
 
 # For Ubuntu (used when --ubuntu flag is passed):
-PACKAGES_TO_INSTALL_UBUNTU="alacritty binutils btop chromium-browser curl eza fzf git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
+PACKAGES_TO_INSTALL_UBUNTU="alacritty binutils btop chromium-browser curl eza fzf gedit git gimp golang gvfs-backends htop iperf3 keepassxc neovim openvpn pdftk-java python-is-python3 ripgrep ristretto rofi screenfetch starship vim wget xdotool yq zoxide zsh zsh-autosuggestions zsh-syntax-highlighting"
 
 # Packages to remove (space-separated list)
 PACKAGES_TO_REMOVE="brasero firefox* thunderbird gnome-chess gnome-games goldendict-ng hexchat hoichess pidgin remmina transmission* x11vnc"
